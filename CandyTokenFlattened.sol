@@ -1,6 +1,8 @@
-// SPDX-License-Identifier: MIT
 
-pragma solidity >=0.6.0 <0.8.0;
+// File: openzeppelin-contracts-3.0.0/contracts/GSN/Context.sol
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -12,7 +14,11 @@ pragma solidity >=0.6.0 <0.8.0;
  *
  * This contract is only required for intermediate, library-like contracts.
  */
-abstract contract Context {
+contract Context {
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+
     function _msgSender() internal view virtual returns (address payable) {
         return msg.sender;
     }
@@ -23,9 +29,9 @@ abstract contract Context {
     }
 }
 
-// SPDX-License-Identifier: MIT
+// File: openzeppelin-contracts-3.0.0/contracts/token/ERC20/IERC20.sol
 
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.6.0;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -101,10 +107,9 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
+// File: openzeppelin-contracts-3.0.0/contracts/math/SafeMath.sol
 
-// SPDX-License-Identifier: MIT
-
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.6.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -127,7 +132,6 @@ library SafeMath {
      * Counterpart to Solidity's `+` operator.
      *
      * Requirements:
-     *
      * - Addition cannot overflow.
      */
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -144,7 +148,6 @@ library SafeMath {
      * Counterpart to Solidity's `-` operator.
      *
      * Requirements:
-     *
      * - Subtraction cannot overflow.
      */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -158,7 +161,6 @@ library SafeMath {
      * Counterpart to Solidity's `-` operator.
      *
      * Requirements:
-     *
      * - Subtraction cannot overflow.
      */
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
@@ -175,7 +177,6 @@ library SafeMath {
      * Counterpart to Solidity's `*` operator.
      *
      * Requirements:
-     *
      * - Multiplication cannot overflow.
      */
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -201,7 +202,6 @@ library SafeMath {
      * uses an invalid opcode to revert (consuming all remaining gas).
      *
      * Requirements:
-     *
      * - The divisor cannot be zero.
      */
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -217,10 +217,10 @@ library SafeMath {
      * uses an invalid opcode to revert (consuming all remaining gas).
      *
      * Requirements:
-     *
      * - The divisor cannot be zero.
      */
     function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
         require(b > 0, errorMessage);
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
@@ -237,7 +237,6 @@ library SafeMath {
      * invalid opcode to revert (consuming all remaining gas).
      *
      * Requirements:
-     *
      * - The divisor cannot be zero.
      */
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -253,7 +252,6 @@ library SafeMath {
      * invalid opcode to revert (consuming all remaining gas).
      *
      * Requirements:
-     *
      * - The divisor cannot be zero.
      */
     function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
@@ -262,12 +260,82 @@ library SafeMath {
     }
 }
 
+// File: openzeppelin-contracts-3.0.0/contracts/utils/Address.sol
+
+pragma solidity ^0.6.2;
+
+/**
+ * @dev Collection of functions related to the address type
+ */
+library Address {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
+        // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned
+        // for accounts without code, i.e. `keccak256('')`
+        bytes32 codehash;
+        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
+        // solhint-disable-next-line no-inline-assembly
+        assembly { codehash := extcodehash(account) }
+        return (codehash != accountHash && codehash != 0x0);
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
+        (bool success, ) = recipient.call{ value: amount }("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+}
+
+// File: openzeppelin-contracts-3.0.0/contracts/token/ERC20/ERC20.sol
+
+
+pragma solidity ^0.6.0;
+
+
+
+
+
 /**
  * @dev Implementation of the {IERC20} interface.
  *
  * This implementation is agnostic to the way tokens are created. This means
  * that a supply mechanism has to be added in a derived contract using {_mint}.
- * For a generic mechanism see {ERC20PresetMinterPauser}.
+ * For a generic mechanism see {ERC20MinterPauser}.
  *
  * TIP: For a detailed writeup see our guide
  * https://forum.zeppelin.solutions/t/how-to-implement-erc20-supply-mechanisms/226[How
@@ -288,6 +356,7 @@ library SafeMath {
  */
 contract ERC20 is Context, IERC20 {
     using SafeMath for uint256;
+    using Address for address;
 
     mapping (address => uint256) private _balances;
 
@@ -308,9 +377,9 @@ contract ERC20 is Context, IERC20 {
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor (string memory name_, string memory symbol_) public {
-        _name = name_;
-        _symbol = symbol_;
+    constructor (string memory name, string memory symbol) public {
+        _name = name;
+        _symbol = symbol;
         _decimals = 18;
     }
 
@@ -396,10 +465,9 @@ contract ERC20 is Context, IERC20 {
      * @dev See {IERC20-transferFrom}.
      *
      * Emits an {Approval} event indicating the updated allowance. This is not
-     * required by the EIP. See the note at the beginning of {ERC20}.
+     * required by the EIP. See the note at the beginning of {ERC20};
      *
      * Requirements:
-     *
      * - `sender` and `recipient` cannot be the zero address.
      * - `sender` must have a balance of at least `amount`.
      * - the caller must have allowance for ``sender``'s tokens of at least
@@ -477,7 +545,7 @@ contract ERC20 is Context, IERC20 {
      *
      * Emits a {Transfer} event with `from` set to the zero address.
      *
-     * Requirements:
+     * Requirements
      *
      * - `to` cannot be the zero address.
      */
@@ -497,7 +565,7 @@ contract ERC20 is Context, IERC20 {
      *
      * Emits a {Transfer} event with `to` set to the zero address.
      *
-     * Requirements:
+     * Requirements
      *
      * - `account` cannot be the zero address.
      * - `account` must have at least `amount` tokens.
@@ -513,9 +581,9 @@ contract ERC20 is Context, IERC20 {
     }
 
     /**
-     * @dev Sets `amount` as the allowance of `spender` over the `owner` s tokens.
+     * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
      *
-     * This internal function is equivalent to `approve`, and can be used to
+     * This is internal function is equivalent to `approve`, and can be used to
      * e.g. set automatic allowances for certain subsystems, etc.
      *
      * Emits an {Approval} event.
@@ -560,207 +628,16 @@ contract ERC20 is Context, IERC20 {
      */
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual { }
 }
-//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.0.0/contracts/token/ERC20/ERC20.sol";
+
+// File: contracts/token/CandyToken.sol
 
 
 
-// SPDX-License-Identifier: MIT
-
-pragma solidity >=0.6.0 <0.8.0;
-
-
-/**
- * @dev Extension of {ERC20} that allows token holders to destroy both their own
- * tokens and those that they have an allowance for, in a way that can be
- * recognized off-chain (via event analysis).
- */
-abstract contract ERC20Burnable is Context, ERC20 {
-    using SafeMath for uint256;
-
-    /**
-     * @dev Destroys `amount` tokens from the caller.
-     *
-     * See {ERC20-_burn}.
-     */
-    function burn(uint256 amount) public virtual {
-        _burn(_msgSender(), amount);
-    }
-
-    /**
-     * @dev Destroys `amount` tokens from `account`, deducting from the caller's
-     * allowance.
-     *
-     * See {ERC20-_burn} and {ERC20-allowance}.
-     *
-     * Requirements:
-     *
-     * - the caller must have allowance for ``accounts``'s tokens of at least
-     * `amount`.
-     */
-    function burnFrom(address account, uint256 amount) public virtual {
-        uint256 decreasedAllowance = allowance(account, _msgSender()).sub(amount, "ERC20: burn amount exceeds allowance");
-
-        _approve(account, _msgSender(), decreasedAllowance);
-        _burn(account, amount);
-    }
-}
-
-// SPDX-License-Identifier: MIT
-
-// SPDX-License-Identifier: MIT
-
-pragma solidity >=0.6.0 <0.8.0;
-
-/**
- * @dev Contract module which allows children to implement an emergency stop
- * mechanism that can be triggered by an authorized account.
- *
- * This module is used through inheritance. It will make available the
- * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
- * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
- */
-abstract contract Pausable is Context {
-    /**
-     * @dev Emitted when the pause is triggered by `account`.
-     */
-    event Paused(address account);
-
-    /**
-     * @dev Emitted when the pause is lifted by `account`.
-     */
-    event Unpaused(address account);
-
-    bool private _paused;
-
-    /**
-     * @dev Initializes the contract in unpaused state.
-     */
-    constructor () internal {
-        _paused = false;
-    }
-
-    /**
-     * @dev Returns true if the contract is paused, and false otherwise.
-     */
-    function paused() public view returns (bool) {
-        return _paused;
-    }
-
-    /**
-     * @dev Modifier to make a function callable only when the contract is not paused.
-     *
-     * Requirements:
-     *
-     * - The contract must not be paused.
-     */
-    modifier whenNotPaused() {
-        require(!_paused, "Pausable: paused");
-        _;
-    }
-
-    /**
-     * @dev Modifier to make a function callable only when the contract is paused.
-     *
-     * Requirements:
-     *
-     * - The contract must be paused.
-     */
-    modifier whenPaused() {
-        require(_paused, "Pausable: not paused");
-        _;
-    }
-
-    /**
-     * @dev Triggers stopped state.
-     *
-     * Requirements:
-     *
-     * - The contract must not be paused.
-     */
-    function _pause() internal virtual whenNotPaused {
-        _paused = true;
-        emit Paused(_msgSender());
-    }
-
-    /**
-     * @dev Returns to normal state.
-     *
-     * Requirements:
-     *
-     * - The contract must be paused.
-     */
-    function _unpause() internal virtual whenPaused {
-        _paused = false;
-        emit Unpaused(_msgSender());
-    }
-}
-
-
-/**
- * @dev ERC20 token with pausable token transfers, minting and burning.
- *
- * Useful for scenarios such as preventing trades until the end of an evaluation
- * period, or having an emergency switch for freezing all token transfers in the
- * event of a large bug.
- */
-abstract contract ERC20Pausable is ERC20, Pausable {
-    function transfer(address to, uint256 value)
-        override public
-        whenNotPaused
-        returns (bool)
-    {
-        return super.transfer(to, value);
-    }
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) override public whenNotPaused returns (bool) {
-        return super.transferFrom(from, to, value);
-    }
-
-    function approve(address spender, uint256 value)
-        override public
-        whenNotPaused
-        returns (bool)
-    {
-        return super.approve(spender, value);
-    }
-
-    function increaseAllowance(address spender, uint256 addedValue)
-        override public
-        whenNotPaused
-        returns (bool success)
-    {
-        return super.increaseAllowance(spender, addedValue);
-    }
-
-    function decreaseAllowance(address spender, uint256 subtractedValue)
-        override public
-        whenNotPaused
-        returns (bool success)
-    {
-        return super.decreaseAllowance(spender, subtractedValue);
-    }    
-    /**
-     * @dev See {ERC20-_beforeTokenTransfer}.
-     *
-     * Requirements:
-     *
-     * - the contract must not be paused.
-     */
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
-        super._beforeTokenTransfer(from, to, amount);
-
-        require(!paused(), "ERC20Pausable: token transfer while paused");
-    }
-}
+pragma solidity ^0.6.10;
 
 
 //ERC20("CRYPTO CANDY", "CANDY")
-contract CryptoCandyToken is Context, ERC20 ,ERC20Burnable{
+contract CryptoCandyToken is ERC20 {
     constructor (string memory name, string memory symbol)
         ERC20(name, symbol)
         public
@@ -769,6 +646,6 @@ contract CryptoCandyToken is Context, ERC20 ,ERC20Burnable{
         // Similar to how
         // 1 dollar = 100 cents
         // 1 token = 1 * (10 ** decimals)
-        _mint(msg.sender, 100 * 10 ** uint(decimals()));
+        _mint(msg.sender, 800000000 * (10**uint256(18)));
     }
 }
