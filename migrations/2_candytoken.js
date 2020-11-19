@@ -1,11 +1,7 @@
 const CandyToken = artifacts.require("./CandyToken.sol");
-const CandyCrowdsale = artifacts.require("./CandyCrowdsale.sol");
-const CandyAirdrop = artifacts.require("./CandyAirdrop.sol");
+// const CandyCrowdsale = artifacts.require("./CandyCrowdsale.sol");
+// const CandyAirdrop = artifacts.require("./CandyAirdrop.sol");
 
-const name = "CRYPTO CANDY";
-const symbol = "CANDY";
-const decimals = 18;
-const initialSupply = 800000000; // 9??
 
 // TODO: Change this parameters in mainnet deployment
 const rate = 21935; // 1 ETH = 21,935.9375 CANDY token
@@ -30,11 +26,11 @@ const TokenContractDeployer = (deployer, network) => {
   ) {
     // MainNet
     deployer
-      .deploy(CandyToken, name, symbol, decimals, initialSupply)
+      .deploy(CandyToken)
       .then((_) =>
         console.log(
           "CANDY Token contract has been deployed successfully. CandyToken.address =" +
-            CandyToken.address
+          CandyToken.address
         )
       );
   } else {
@@ -58,36 +54,36 @@ const TokenContractDeployer = (deployer, network) => {
 // const CANDY_CROWDSALE_ADDRESS = '0x69f75e30ee83a450b033fd6451fd7993051bb19c';
 
 // Deployer
-const SaleContractDeployer = (deployer, network) => {
-  deployer
-    .deploy(
-      CandyCrowdsale,
-      rate,
-      wallet,
-      getTokenAddress(network),
-      totalSaleCap
-    )
-    .then((_) =>
-      console.log(
-        `CANDY Crowdsale contract has been deployed successfully on ${network}.`
-      )
-    );
-};
+// const SaleContractDeployer = (deployer, network) => {
+//   deployer
+//     .deploy(
+//       CandyCrowdsale,
+//       rate,
+//       wallet,
+//       getTokenAddress(network),
+//       totalSaleCap
+//     )
+//     .then((_) =>
+//       console.log(
+//         `CANDY Crowdsale contract has been deployed successfully on ${network}.`
+//       )
+//     );
+// };
 
-function getTokenAddress(network) {
-  switch (network) {
-    case "mainnet":
-      return CANDY_TOKEN_ADDRESS_MAINNET;
-    case "ropsten":
-      return CANDY_TOKEN_ADDRESS_ROPSTEN;
-    case "baobab":
-      return CANDY_TOKEN_ADDRESS_BAOBAB;
-    case "cypress":
-      return CANDY_TOKEN_ADDRESS_CYPRESS;
-    default:
-      throw new Error("Unknown network!");
-  }
-}
+// function getTokenAddress(network) {
+//   switch (network) {
+//     case "mainnet":
+//       return CANDY_TOKEN_ADDRESS_MAINNET;
+//     case "ropsten":
+//       return CANDY_TOKEN_ADDRESS_ROPSTEN;
+//     case "baobab":
+//       return CANDY_TOKEN_ADDRESS_BAOBAB;
+//     case "cypress":
+//       return CANDY_TOKEN_ADDRESS_CYPRESS;
+//     default:
+//       throw new Error("Unknown network!");
+//   }
+// }
 
 /************* CANDY Airdrop deployed information ***************/
 
@@ -95,15 +91,15 @@ function getTokenAddress(network) {
 // const CANDY_AIRDROP_ADDRESS = '0x84b148d389a94bf97abba8bf04bc4b0f33355418';
 
 // Deployer
-const AirdropContractDeployer = (deployer, network) => {
-  deployer
-    .deploy(CandyAirdrop, getTokenAddress(network))
-    .then((_) =>
-      console.log(
-        `CANDY Airdrop contract has been deployed successfully on ${network}.`
-      )
-    );
-};
+// const AirdropContractDeployer = (deployer, network) => {
+//   deployer
+//     .deploy(CandyAirdrop, getTokenAddress(network))
+//     .then((_) =>
+//       console.log(
+//         `CANDY Airdrop contract has been deployed successfully on ${network}.`
+//       )
+//     );
+// };
 
 /*****************************************************************/
 

@@ -1,25 +1,19 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: MIT
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Pausable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
+pragma solidity ^0.6.10;
 
-contract CandyToken is ERC20Detailed, ERC20Pausable, ERC20Burnable {
-    /**
-     * @dev constructor to mint initial tokens
-     * @param name string
-     * @param symbol string
-     * @param decimals uint8
-     * @param initialSupply uint256
-     */
-    constructor(
-        string name,
-        string symbol,
-        uint8 decimals,
-        uint256 initialSupply
-    ) public ERC20Detailed(name, symbol, decimals) {
-        // Mint the initial supply
-        require(initialSupply > 0, "initialSupply must be greater than zero.");
-        _mint(msg.sender, initialSupply * (10**uint256(decimals)));
+import "openzeppelin-contracts-3.0.0/contracts/token/ERC20/ERC20.sol";
+
+//ERC20("CRYPTO CANDY", "CANDY")
+contract CryptoCandyToken is ERC20 {
+    constructor (string memory name, string memory symbol)
+        ERC20(name, symbol)
+        public
+    {
+        // Mint 100 tokens to msg.sender
+        // Similar to how
+        // 1 dollar = 100 cents
+        // 1 token = 1 * (10 ** decimals)
+        _mint(msg.sender, 800000000 * (10**uint256(18)));
     }
 }
