@@ -2,7 +2,7 @@
 
 ## 2020-12-23
 ```
-Udd ERC20Pausable function
+Add ERC20Pausable function
 Use CandyTokenFlattened.sol with remix.ethereum.org
 
 ```
