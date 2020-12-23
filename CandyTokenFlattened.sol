@@ -1,3 +1,24 @@
+// SPDX-License-Identifier: MIT
+/*
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.6.0 <0.8.0;
+
+import "github/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "github/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/ERC20Burnable.sol";
+import "github/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/ERC20Pausable.sol";
+
+//ERC20("CRYPTO CANDY", "CANDY")
+contract CryptoCandyToken is Context, ERC20 ,ERC20Burnable{
+    constructor (string memory name, string memory symbol)
+        ERC20(name, symbol)
+        public
+    {
+        _mint(msg.sender, 100 * 10 ** uint(decimals()));
+    }
+}
+*/
+
+
 
 // File: openzeppelin-contracts-3.0.0/contracts/GSN/Context.sol
 
@@ -631,21 +652,149 @@ contract ERC20 is Context, IERC20 {
 
 // File: contracts/token/CandyToken.sol
 
+pragma solidity ^0.6.0;
+
+
+/**
+ * @dev Extension of {ERC20} that allows token holders to destroy both their own
+ * tokens and those that they have an allowance for, in a way that can be
+ * recognized off-chain (via event analysis).
+ */
+abstract contract ERC20Burnable is Context, ERC20 {
+    /**
+     * @dev Destroys `amount` tokens from the caller.
+     *
+     * See {ERC20-_burn}.
+     */
+    function burn(uint256 amount) public virtual {
+        _burn(_msgSender(), amount);
+    }
+
+    /**
+     * @dev Destroys `amount` tokens from `account`, deducting from the caller's
+     * allowance.
+     *
+     * See {ERC20-_burn} and {ERC20-allowance}.
+     *
+     * Requirements:
+     *
+     * - the caller must have allowance for ``accounts``'s tokens of at least
+     * `amount`.
+     */
+    function burnFrom(address account, uint256 amount) public virtual {
+        uint256 decreasedAllowance = allowance(account, _msgSender()).sub(amount, "ERC20: burn amount exceeds allowance");
+
+        _approve(account, _msgSender(), decreasedAllowance);
+        _burn(account, amount);
+    }
+}
+
+/**
+ * @dev Contract module which allows children to implement an emergency stop
+ * mechanism that can be triggered by an authorized account.
+ *
+ * This module is used through inheritance. It will make available the
+ * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+ * the functions of your contract. Note that they will not be pausable by
+ * simply including this module, only once the modifiers are put in place.
+ */
+contract Pausable is Context {
+    /**
+     * @dev Emitted when the pause is triggered by `account`.
+     */
+    event Paused(address account);
+
+    /**
+     * @dev Emitted when the pause is lifted by `account`.
+     */
+    event Unpaused(address account);
+
+    bool private _paused;
+
+    /**
+     * @dev Initializes the contract in unpaused state.
+     */
+    constructor () internal {
+        _paused = false;
+    }
+
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() public view returns (bool) {
+        return _paused;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is not paused.
+     */
+    modifier whenNotPaused() {
+        require(!_paused, "Pausable: paused");
+        _;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     */
+    modifier whenPaused() {
+        require(_paused, "Pausable: not paused");
+        _;
+    }
+
+    /**
+     * @dev Triggers stopped state.
+     */
+    function _pause() internal virtual whenNotPaused {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
+
+    /**
+     * @dev Returns to normal state.
+     */
+    function _unpause() internal virtual whenPaused {
+        _paused = false;
+        emit Unpaused(_msgSender());
+    }
+}
+
+
+/**
+ * @dev ERC20 token with pausable token transfers, minting and burning.
+ *
+ * Useful for scenarios such as preventing trades until the end of an evaluation
+ * period, or having an emergency switch for freezing all token transfers in the
+ * event of a large bug.
+ */
+abstract contract ERC20Pausable is ERC20, Pausable {
+    /**
+     * @dev See {ERC20-_beforeTokenTransfer}.
+     *
+     * Requirements:
+     *
+     * - the contract must not be paused.
+     */
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
+        super._beforeTokenTransfer(from, to, amount);
+
+        require(!paused(), "ERC20Pausable: token transfer while paused");
+    }
+}
 
 
 pragma solidity ^0.6.10;
 
 
 //ERC20("CRYPTO CANDY", "CANDY")
-contract CryptoCandyToken is ERC20 {
+contract CryptoCandyToken is ERC20,ERC20Burnable,ERC20Pausable {
     constructor (string memory name, string memory symbol)
         ERC20(name, symbol)
         public
     {
-        // Mint 100 tokens to msg.sender
-        // Similar to how
-        // 1 dollar = 100 cents
-        // 1 token = 1 * (10 ** decimals)
         _mint(msg.sender, 800000000 * (10**uint256(18)));
     }
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20, ERC20Pausable) {
+        super._beforeTokenTransfer(from, to, amount);
+    }    
 }
